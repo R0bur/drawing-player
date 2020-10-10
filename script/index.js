@@ -49,8 +49,10 @@ function start ()
 		/* Настройка приложения на работу с выбранным языком. */
 		if (lang != "??")
 			i18n.language = lang;
-		program.language = i18n.plTree[lang];
-		document.documentElement.setAttribute ("lang", lang);
+		if (typeof i18n.strTable[i18n.language] == "string")
+			i18n.language = i18n.strTable[i18n.language];
+		program.language = i18n.plTree[i18n.language];
+		document.documentElement.setAttribute ("lang", i18n.language);
 		document.getElementById ("title").innerText = i18n.string (1000);
 	}
 	/*-------------------------------------*/
