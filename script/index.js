@@ -3,7 +3,6 @@
 /* Автор: Игорь Сергеевич Орещенков, 2020 г. */
 /* Язык программирования: JavaScript.        */
 /*===========================================*/
-app = new Object ();	/* Объект для хранения состояния приложения. */
 /*====================*/
 /* Стартовая функция. */
 /*====================*/
@@ -38,8 +37,8 @@ function start ()
 	/*------------------------------------------*/
 	function selectInterfaceLanguage () {
 		var qp = getQueryParameters (),
-		lang1 = qp.lang? qp.lang: navigator.language,	/* предпочтительный язык */
-		langs = i18n.languages (),			/* список доступных языков */
+		lang1 = qp.lang? qp.lang: app.lang? app.lang: navigator.language,	/* предпочтительный язык */
+		langs = i18n.languages (),	/* список доступных языков */
 		lang = "??", i;
 		/* Выбор языка. */
 		for (i = 0; i < langs.length; i++)
@@ -475,7 +474,6 @@ function start ()
 		{hotkey: "TAB", text: i18n.string (70), handler: switchMode1}
 	]
 	];
-	app.mode = 0;
 	app.userinput = false;
 	player.init ();
 	board.init (document.getElementById ("board"), 301, 381, 20, 20);
@@ -483,7 +481,13 @@ function start ()
 	editor.init (document.getElementById ("editor").firstChild);
 	bulletin.init (document.getElementById ("bulletin"));
 	player.reset ();
-	createMenubar (document.getElementById ("menubar"), app.modes[app.mode]);
-	switchMode1 ();
+	/* createMenubar (document.getElementById ("menubar"), app.modes[app.mode]); */
+	switch (app.mode) {
+		case 1: switchMode2 ();
+			break;
+		case 2: switchMode3 ();
+			break;
+		default: switchMode1 ();
+	}
 	window.onresize = wndResize;
 }

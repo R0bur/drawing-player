@@ -9,7 +9,8 @@ var editor = new Object ();
 editor.init = function (elem) {
 	elem.spellcheck = false;
 	elem.translate = false;
-	elem.value = "";
+	if (elem.value == "PROGRAM_HERE")
+		elem.value = "";
 	this.elem = elem;
 };
 /*====================================================================*/
