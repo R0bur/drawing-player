@@ -53,6 +53,7 @@ function start ()
 		program.language = i18n.plTree[i18n.language];
 		document.documentElement.setAttribute ("lang", i18n.language);
 		document.getElementById ("title").innerText = i18n.string (1000);
+		document.title = i18n.string (1001);
 	}
 	/*-------------------------------------*/
 	/* Разрешение пользовательского ввода. */

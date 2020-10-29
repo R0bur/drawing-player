@@ -32,6 +32,7 @@ i18n.strTable.en = {
 	/* index.html*/
 	/*-----------*/
 	1000: "DRAWING PLAYER",
+	1001: "DRAPL",
 	/*----------*/
 	/* index.js */
 	/*----------*/
