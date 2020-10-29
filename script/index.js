@@ -117,6 +117,11 @@ function start ()
 		player.reset ();
 		switchMode1 ();
 	}
+	function doReset3 ()
+	{
+		player.reset ();
+		switchMode3 ();
+	}
 	/*------------------------------------------------*/
 	/* Переключение режима работы программы.          */
 	/* Вызов: elem - HTML-элемент строки меню,        */
@@ -471,7 +476,7 @@ function start ()
 		{hotkey: "F1", text: i18n.string (66), handler: prgStartNormal},
 		{hotkey: "F2", text: i18n.string (67), handler: prgDebug},
 		{hotkey: "F5", text: i18n.string (68), handler: prgFinalResult},
-		{hotkey: "ESC", text: i18n.string (69), handler: doReset},
+		{hotkey: "ESC", text: i18n.string (69), handler: doReset3},
 		{hotkey: "TAB", text: i18n.string (70), handler: switchMode1}
 	]
 	];
