@@ -18,7 +18,7 @@ end of choice
 
 while [no] edge ahead, repeat
 	...
-end of cycle
+end of loop
 
 procedure NAME
 	...
