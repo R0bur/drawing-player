@@ -17,7 +17,7 @@ i18n.plTree.en = {
 	"end": {
 		"of": {
 			"choice": 6,
-			"cycle": 7,
+			"loop": 7,
 			"procedure": 8
 		}
 	},
@@ -96,11 +96,11 @@ i18n.strTable.en = {
 	40: "procedure ",
 	/* Text for input to the editor for clarification "end" menu item. */
 	41: "of choice",
-	42: "of cycle",
+	42: "of loop",
 	43: "of procedure",
 	/* Menu items of the "end" clarification submode. */
 	44: "…of choice",
-	45: "…of cycle",
+	45: "…of loop",
 	46: "…of procedure",
 	/* Text for input to the editor by menu item "end". */
 	47: "end ",
@@ -140,14 +140,14 @@ i18n.strTable.en = {
 	103: "Runtime error.",
 	104: "The command \"%1\" is missed.",
 	105: "end of choice",
-	106: "end of cycle",
+	106: "end of loop",
 	107: "end of procedure",
 	108: "The Player is crashed.",
 	109: "The nesting level is exceeded.",
 	110: "\"else\" without preceding \"if\"",
 	111: "Another command.",
 	112: "\"end of choice\" without preceding \"if\"",
-	113: "\"end of cycle\" without preceding \"while\"",
+	113: "\"end of loop\" without preceding \"while\"",
 	114: "\"end of procedure\" without preceding \"procedure\" or \"do\"",
 	115: "Procedure definition cannot be nested.",
 	116: "Procedure \"%1\" is not defined.",
