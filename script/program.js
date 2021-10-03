@@ -124,6 +124,7 @@ program.start = function (mode, done)
 	this.command = null;		/* объект с информацией о команде */
 	this.timeout = 500;		/* временной интервал между командами, миллисекунд */
 	this.active = true;		/* признак необходимости выполнения команд */
+	this.npass = 0;			/* количество повторных рассмотрений команды */
 	/* Выключение отображения исполнителя в быстром режиме. */
 	if (mode == 1)
 		player.display (false);
@@ -152,7 +153,7 @@ program.start = function (mode, done)
 /*================================================================*/
 program.executeCommand = function (done, imdone)
 {
-	var o = this, topOfStack;
+	var o = this, nextCommandIsScheduled = false, topOfStack;
 	/*----------------------------------------------------------------------*/
 	/* Выполнение заключительных действий перед вызовом функции завершения. */
 	/*----------------------------------------------------------------------*/
@@ -226,9 +227,8 @@ program.executeCommand = function (done, imdone)
 					player.walk (false, planNextCommand, 0);
 				/* Учёт выполненного прыжка. */
 				this.counters[0]++;
+				nextCommandIsScheduled = true;
 			}
-			else
-				planNextCommand ();
 			break;
 		case -2: /* шаг */
 			if (this.active) {
@@ -240,9 +240,8 @@ program.executeCommand = function (done, imdone)
 					player.walk (true, planNextCommand, 0);
 				/* Учёт выполненного шага. */
 				this.counters[1]++;
+				nextCommandIsScheduled = true;
 			}
-			else
-				planNextCommand ();
 			break;
 		case -3: /* поворот */
 			if (this.active) {
@@ -254,29 +253,24 @@ program.executeCommand = function (done, imdone)
 					player.turn (planNextCommand, 0);
 				/* Учёт выполненного поворота. */
 				this.counters[2]++;
+				nextCommandIsScheduled = true;
 			}
-			else
-				planNextCommand ();
 			break;
 		case 1: /* если впереди край, то */
-			if (this.stack.length < this.stackCapacity) {
-				this.stack.push ({code: this.command.code, ip: this.ip, active: this.active});
-				this.active = this.active && player.queryEdgeAhead ();
-			}
-			else
-				/* Ошибка: переполнение стека. */
-				this.error = {
-					message: i18n.string (103),
-					found: i18n.string (109),
-					expected: "",
-					position: -1
-				};
-			planNextCommand (done);
-			break;
 		case 2: /* если впереди не край, то */
+		case 4: /* пока впереди край, выполнять */
+		case 5: /* пока впереди не край, выполнять */
 			if (this.stack.length < this.stackCapacity) {
 				this.stack.push ({code: this.command.code, ip: this.ip, active: this.active});
-				this.active = this.active && !player.queryEdgeAhead ();
+				if (this.active) {
+					this.active = this.command.code == 1 || this.command.code == 4? player.queryEdgeAhead ():
+						!player.queryEdgeAhead ();
+					if (this.mode != 1) {
+						/* Демонстрация результата проверки в обычном режиме выполнения или в режиме отладки. */
+						editor.flashSelection (this.active? 1: 2, o.timeout, planNextCommand);
+						nextCommandIsScheduled = true;
+					}
+				}
 			}
 			else
 				/* Ошибка: переполнение стека. */
@@ -286,15 +280,34 @@ program.executeCommand = function (done, imdone)
 					expected: "",
 					position: -1
 				};
-			planNextCommand (done);
 			break;
 		case 3: /* иначе */
 			topOfStack = this.stack.length? this.stack[this.stack.length - 1]: null;
 			if (topOfStack && (topOfStack.code == 1 || topOfStack.code == 2)) {
 				/* Изменение состояния активности, если вход в команду ветвления */
 				/* был выполнен в активном состоянии.                            */
-				if (topOfStack.active)
-					this.active = !this.active;
+				if (topOfStack.active) {
+					if (this.mode != 1) {
+						if (this.active) {
+							/* Определение реального состояния активности, которое должно быть */
+							/* установлено после выполнения рассматриваемой команды. */
+							this.active = this.npass > 0;
+							this.npass = 0;
+							/* Демонстрация инверсии результата проверки в обычном режиме или в режиме отладки. */
+							editor.flashSelection (this.active? 1: 2, o.timeout, planNextCommand);
+							nextCommandIsScheduled = true;
+						}
+						else {
+							/* Включение состояния активности потока выполнения и направление на второй проход. */
+							this.active = true;
+							this.npass = 1;
+							this.ip--;
+						}
+					}
+					else
+						/* В быстром режиме - просто изменение состояния активности потока выполнения. */
+						this.active = !this.active;
+				}
 			}
 			else
 				/* Ошибка: "иначе" без соответствующего "если". */
@@ -304,59 +317,56 @@ program.executeCommand = function (done, imdone)
 					expected: i18n.string (111),
 					position: 0
 				};
-			planNextCommand (done);
-			break;
-		case 4: /* пока впереди край */
-			if (this.stack.length < this.stackCapacity) {
-				this.stack.push ({code: this.command.code, ip: this.ip, active: this.active});
-				this.active = this.active && player.queryEdgeAhead ();
-			}
-			else
-				/* Ошибка: переполнение стека. */
-				this.error = {
-					message: i18n.string (103),
-					found: i18n.string (109),
-					expected: "",
-					position: -1
-				};
-			planNextCommand (done);
-			break;
-		case 5: /* пока впереди не край */
-			if (this.stack.length < this.stackCapacity) {
-				this.stack.push ({code: this.command.code, ip: this.ip, active: this.active});
-				this.active = this.active && !player.queryEdgeAhead ();
-			}
-			else
-				/* Ошибка: переполнение стека. */
-				this.error = {
-					message: i18n.string (103),
-					found: i18n.string (109),
-					expected: "",
-					position: -1
-				};
-			planNextCommand (done);
 			break;
 		case 6: /* конец ветвления */
-			topOfStack = this.stack.pop ();
-			if (topOfStack && (topOfStack.code == 1 || topOfStack.code == 2))
-				/* Восстановление состояния активности, действующего */
-				/* на момент входа в команду ветвления.              */
-				this.active = topOfStack.active;
-			else
-				/* Ошибка: "конец ветвления" без соотвествующего "если". */
-				this.error = {
-					message: i18n.string (103),
-					found: i18n.string (112),
-					expected: i18n.string (111),
-					position: 0
-				};
-			planNextCommand (done);
+			if (this.npass == 0) {
+				topOfStack = this.stack.pop ();
+				if (topOfStack && (topOfStack.code == 1 || topOfStack.code == 2))
+					if (topOfStack.active && this.mode != 1)
+						if (this.active) {
+							/* Обозначение завершения блока ветвления в обычном режиме или режиме отладки. */
+							editor.flashSelection (0, o.timeout, planNextCommand);
+							nextCommandIsScheduled = true;
+						}
+						else {
+							/* Включение состояния активности потока выполнения и направление на второй проход. */
+							this.active = true;
+							this.npass = 1;
+							this.ip--;
+						}
+					else
+						/* В режиме быстрого выполдения или когда ветвление пропускаяется */
+						/* просто обновляется признак активности выполнения программы. */
+						this.active = topOfStack.active;
+				else
+					/* Ошибка: "конец ветвления" без соотвествующего "если". */
+					this.error = {
+						message: i18n.string (103),
+						found: i18n.string (112),
+						expected: i18n.string (111),
+						position: 0
+					};
+			}
+			else {
+				/* Сброс счётчика проходов. */
+				this.npass = 0;
+				/* Обозначение завершения блока ветвления. */
+				editor.flashSelection (0, o.timeout, planNextCommand);
+				nextCommandIsScheduled = true;
+			}
 			break;
 		case 7: /* конец цикла */
 			topOfStack = this.stack.pop ();
 			if (topOfStack && (topOfStack.code == 4 || topOfStack.code == 5))
-				if (this.active)
+				if (this.active) {
+					/* Установка начала цикла в качестве очередной команды. */
 					this.ip = topOfStack.ip - 1;
+					if (this.mode != 1) {
+						/* Демонстрация завершения конца цикла в обычном режиме или режиме отладки. */
+						editor.flashSelection (0, o.timeout, planNextCommand);
+						nextCommandIsScheduled = true;
+					}
+				}
 				else
 					this.active = topOfStack.active;
 			else
@@ -367,7 +377,6 @@ program.executeCommand = function (done, imdone)
 					expected: i18n.string (111),
 					position: 0
 				};
-			planNextCommand (done);
 			break;
 		case 8: /* конец процедуры */
 			topOfStack = this.stack.pop ();
@@ -375,10 +384,16 @@ program.executeCommand = function (done, imdone)
 				if (topOfStack.code == 9)
 					/* Восстановление активности после пропуска определения процедуры. */
 					this.active = topOfStack.active;
-				else
+				else {
 					/*     Возврат после завершения выполнения процедуры   */
 					/* ("сделай" помещается в стек только в активном режиме) */
 					this.ip = topOfStack.ip;
+					if (this.mode != 1) {
+						/* Демонстрация конца процедуры в обычном режиме или режиме отладки. */
+						editor.flashSelection (0, o.timeout, planNextCommand);
+						nextCommandIsScheduled = true;
+					}
+				}
 			else
 				/* Ошибка: конец процедуры без соответствующего заголовка или вызова. */
 				this.error = {
@@ -387,30 +402,46 @@ program.executeCommand = function (done, imdone)
 					expected: i18n.string (111),
 					position: 0
 				}
-			planNextCommand (done);
 			break;
 		case 9: /* процедура */
-			if (this.stack.length == 0) {
-				this.stack.push ({code: this.command.code, ip: this.ip, active: this.active});
-				/* Отключение выполнения команд, находящихся в определении процедуры. */
-				this.active = false;
+			if (this.npass == 0) {
+				if (this.stack.length == 0) {
+					this.stack.push ({code: this.command.code, ip: this.ip, active: this.active});
+					/* Отключение выполнения команд, находящихся в определении процедуры. */
+					this.active = false;
+				}
+				else
+					/* Ошибка: определение процедуры должно находиться на верхнем уровне. */
+					this.error = {
+						message: i18n.string (103),
+						found: i18n.string (115),
+						expected: i18n.string (111),
+						position: 0
+					};
 			}
-			else
-				/* Ошибка: определение процедуры должно находиться на верхнем уровне. */
-				this.error = {
-					message: i18n.string (103),
-					found: i18n.string (115),
-					expected: i18n.string (111),
-					position: 0
-				};
-			planNextCommand (done);
+			else {
+				/* Сброс признака перехода по команде "сделай". */
+				this.npass = 0;
+				if (this.mode != 1) {
+					/* Демонстрация начала выполнения процедуры в обычном режиме или режиме отладки. */
+					editor.flashSelection (0, o.timeout, planNextCommand);
+					nextCommandIsScheduled = true;
+				}
+			}
 			break;
 		case 10: /* сделай */
 			if (this.active) {
 				if (this.proc[this.command.args[0]] != undefined) {
 					if (this.stack.length < this.stackCapacity) {
 						this.stack.push ({code: this.command.code, ip: this.ip, active: this.active});
-						this.ip = this.proc[this.command.args[0]];
+						this.ip = this.proc[this.command.args[0]] - 1;
+						/* Установка признака перехода по команде "сделай". */
+						this.npass = 1;
+						if (this.mode != 1) {
+							/* Демонстрация выполнения команды вызова подпрограммы в обычном режиме или режиме отладки. */
+							editor.flashSelection (0, o.timeout, planNextCommand);
+							nextCommandIsScheduled = true;
+						}
 					}
 					else
 						/* Ошибка: переполнение стека. */
@@ -430,11 +461,10 @@ program.executeCommand = function (done, imdone)
 						position: -1
 					};
 			}
-			planNextCommand (done);
-			break;
-		default: /* нет команды */
-			planNextCommand (done);
 		}
+		/* Планирование выполнения следующей команды, если это ещё не было сделано. */
+		if (!nextCommandIsScheduled)
+			planNextCommand ();
 	}
 	else
 		/* Завершение выполнения программы. */

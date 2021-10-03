@@ -65,6 +65,44 @@ editor.insert = function (text)
 	else
 		this.elem.value += text;
 };
+/*===========================================================================*/
+/* Метод объекта "редактор" - установка цвета области выделенного текста.    */
+/* Вызов: c - код цвета (0 или 1 - нейтральный, 2 или 3 - условие выполнено, */
+/*                       4 или 5 - условие не выполнено, -1 - обычный).      */
+/*===========================================================================*/
+editor.setSelectionColor = function (c) {
+	var styles = ["neutral1", "neutral2", "condtrue1", "condtrue2", "condfalse1", "condfalse2"], i;
+	if (c >= 0) {
+		for (i in styles)
+			if (i != c)
+				this.elem.classList.remove (styles[i]);
+		this.elem.classList.add (styles[c]);
+	}
+	else
+		for (i in styles)
+			this.elem.classList.remove (styles[i]);
+};
+/*=========================================================================*/
+/* Метод объекта "редактор" - визуальное оповещение о состоянии программы. */
+/* Вызов: c - код цвета выделения (0 - нейтральный, 1 - "да", 2 - "нет",   */
+/*        duration - продолжительность оповещения (в миллисекундах),       */
+/*        done - функция, вызываемая после оповещения.                     */
+/*=========================================================================*/
+editor.flashSelection = function (c, duration, done) {
+	var o = this, i = 0;
+	function changeSelectionColor () {
+		if (i < 3) {
+			o.setSelectionColor (2 * c + i % 2);
+			i++;
+			setTimeout (changeSelectionColor, duration);
+		}
+		else {
+			o.setSelectionColor (-1);
+			done ();
+		}
+	}
+	changeSelectionColor ();
+};
 /*==================================================================*/
 /* Метод объекта "редактор" - выделение строки.                     */
 /* Вызов: k - номер строки,                                         */
@@ -90,29 +128,19 @@ editor.selectLine = function (k, n)
 		/* Выделение строки. */
 		if (document.selection) {
 			/* IE */
-/*			d = this.elem.readonly;
-			if (d)
-				delete this.elem.readonly;*/
-			elem.focus ();
-			elem.select ();
+			this.elem.focus ();
+			this.elem.select ();
 			range = document.selection.createRange ();
 			range.collapse (true);
 			range.moveEnd ("character", endPos);
 			range.moveStart ("character", startPos);
 			range.select ();
-/*			if (d)
-				this.elem.readonly = d;*/
 		}
 		else if (this.elem.selectionStart || this.elem.selectionStart === 0) {
 			/* Others */
-/*			d = this.elem.getAttribute ("readonly");
-			if (d)
-				this.elem.removeAttribute ("readonly");*/
 			this.elem.focus ();
 			this.elem.selectionStart = startPos;
 			this.elem.selectionEnd = endPos;
-/*			if (d)
-				this.elem.setAttribute ("readonly", d);*/
 		}
 		/* Прокрутка текста для размещения выделенной строки в середине области просмотра. */
 		if (this.elem.scrollHeight && this.elem.offsetHeight)
