@@ -1,41 +1,43 @@
-# drawing-player
+# The Actor "Ladybug"
 ## Description
 
-"Drawing Player" is a simple IDE (Integrated Development Environment) and an interpreter for an educational programming language.
+The Actor "Ladybug" is a simple IDE (Integrated Development Environment) and an interpreter for an educational programming language. It is compatible to the "Kangaroo Roo" teaching environment that [was used]((https://web.archive.org/web/20220803112020/https://math.vanderbilt.edu/sapirmv/)) in 1992-1994 for programming classes in Lincoln (NE) for kids 4-7 grades.
 
-The Player acts on a checkered board of size 15 x 19 cells. It can move himself around the edges of cells, drawing (_step_) or not (_jump_), and rotate himself 90 degrees counterclockwise (_turn_). Any time it can verify its position: on the edge of the board or not.
+The Actor itself acts on a checkered board of size 15 x 19 cells. It can move himself around the edges of cells, drawing (_step_) or not (_hop_), and rotate himself 90 degrees counterclockwise (_turn_). Any time it can verify its position: can it move forward or not.
 
 
 ## Programming language
 
 The Programming language of Player contains these statements:
 ```
-jump, step, turn
+hop, step, turn
 
-if [no] edge ahead, then
+if it can [can't] move forward then
+	...	
+otherwise
 	...
-end of choice
+the end of branching
 
-while [no] edge ahead, repeat
+while it can [can't] move forward repeat
 	...
-end of loop
+the end of cycling
 
-procedure NAME
+subroutine NAME
 	...
-end of procedure
+the end of subroutine
 
 do NAME
 ```
 
 ## Integrated Development Environment
 
-The "Drawing Player" environment has three modes.
-The first mode (Interactive) is for manual control the Player.
+The Actor "Ladybug" environment has three modes.
+The first mode (Interactive) is for manual control the Actor.
 The second mode (Programming) is for text of the program editing.
 The third mode (Execution) is for the program execution.
 
 ## Usage
 
-The "Drawing Player" can be started in a web browser using the file "index.html". The default interface language is Russian, but it can be switched using the GET-parameter of URL: index.html?lang=en.
+The Actor "Ladybug" can be started in a web browser using the file "index.html". The default interface language is Russian, but it can be switched using the GET-parameter of URL: index.html?lang=en.
 
-You can look [here](https://iharsw.login.by/gris/index.html?lang=en) how it works.
+You can look [here](https://iharsw.lgn.by/gris/index.html?lang=en) how it works.
