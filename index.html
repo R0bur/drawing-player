@@ -5,16 +5,20 @@
 <meta name="author" lang="ru" content="Игорь Сергеевич Орещенков">
 <meta name="description" lang="ru" content="Среда для обучения программированию ГРИС &laquo;Букашка&raquo;.">
 <meta name="keywords" lang="ru" content="исполнитель,кенгурёнок,roo,программирование,обучение,циклы,ветвления,рекурсия,шаг,прыжок,поворот">
-<meta name="date" content="2021-10-03T20:15:00+03:00">
-<meta name="copyright" content="&copy; Ihar S. Areshchankau, 2020-2021.">
+<meta name="date" content="2023-10-09T20:15:00+03:00">
+<meta name="copyright" content="&copy; Ihar S. Areshchankau, 2020-2023.">
 <title>ГРИС Букашка</title>
 <link href="index.css" rel="stylesheet" type="text/css">
 <link href="favicon.ico" rel="icon" type="image/x-icon">
 <script>
 app = new Object ();	/* Объект для хранения состояния приложения. */
+app.audio = document.createElement ("audio");
+app.version = "1.20";
+app.developed = ", 2020 - 2023.";
 app.mode = 0;
 /* app.mode */
 /* app.lang */
+/* app.sound */
 </script>
 <script src="script/i18n.js"></script>
 <script src="script/i18n_ru.js"></script>
@@ -30,15 +34,15 @@ app.mode = 0;
 <script src="script/player.js"></script>
 <script src="script/index.js"></script>
 </head>
-<body onload="start ()">
+<body class="hidden" onload="init ()">
 <div id="screen">
-<h1 id="title">Название</h1>
-<h2 id="modebar">Режим</h2>
-<div id="menubar">Меню</div>
+<h1 id="title">&nbsp;<!-- Название --></h1>
+<h2 id="modebar">&nbsp;<!-- Режим --></h2>
+<div id="menubar">&nbsp;<!-- Меню --></div>
 <form id="editor"><textarea readonly="readonly">PROGRAM_HERE</textarea></form>
 <canvas id="board">Ваш браузер не поддерживает элемент CANVAS.</canvas>
-<div id="bulletin">Сообщения</div>
-<p><small>Разработчик: <a href="mailto:webmaster@iharsw.login.by?subject=О%20проекте%20ГРИС">Игорь Орещенков</a>, 2020-2021 г.</small></p>
+<div id="bulletin">&nbsp;<!-- Сообщения --></div>
+<div id="statusbar">&nbsp;<!-- Строка состояния --></div>
 </div><!-- id="screen" -->
 </body>
 </html>

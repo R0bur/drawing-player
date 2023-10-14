@@ -1,10 +1,14 @@
 * {margin: 0; padding: 0}
 body {background-color: black; font: normal normal normal 14pt monospace}
 body {-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none}
+/* body.fade {opacity: 0}
+body {opacity: 1; transition-duration: 0.5s; transition-property: opacity}*/
+body.hidden {visibility: hidden}
+body {visibility: visible}
 #screen {width: 720px; margin: 0 auto}
 h1 {color: white; text-align: center; font-size: 1.2857em /* 18pt / 14pt */}
 h2 {color: lightgray; text-align: center; font-size: 1.1429em /* 16pt / 14pt */}
-#menubar, #editor, #board, #bulletin {background-color: darkblue; color: white}
+#menubar, #editor, #board, #bulletin, #statusbar {background-color: darkblue; color: white}
 #menubar a {color: white; margin-left: 1em; text-decoration: none}
 #menubar a span {color: cyan; background: blue}
 #menubar {margin: 1ex 0}
@@ -22,4 +26,8 @@ h2 {color: lightgray; text-align: center; font-size: 1.1429em /* 16pt / 14pt */}
 #bulletin {clear: left; margin-top: 1ex; padding: 0.5ex 0.5em; height: 10ex; color:gray; border: 2px solid gray; font-size: 0.8571em /* 12pt / 14pt */}
 #bulletin.error {color: red}
 #bulletin.success {color: lightgreen}
-p, p a {text-align: center; color: gray}
+#statusbar {margin-top: 1ex; padding-left: 1em}
+#statusbar a {text-decoration: none; color: lightgray}
+#statusbar a var {color: gray; background: darkblue}
+#statusbar .hotkey {background-color: blue; color: cyan}
+/* p, p a {text-align: center; color: gray} */
