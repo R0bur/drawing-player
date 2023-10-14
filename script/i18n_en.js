@@ -2,26 +2,24 @@
 /* Programming language tree. */
 /*============================*/
 i18n.plTree.en = {
-	"jump": -1,
+	"hop": -1,
 	"step": -2,
 	"turn": -3,
-	"if": {
-		"edge": {"ahead,": {"then": 1}},
-		"no": {"edge": {"ahead,": {"then": 2}}}
-	},
-	"else": 3,
-	"while": {
-		"edge": {"ahead,": {"repeat": 4}},
-		"no": {"edge": {"ahead,": {"repeat": 5}}}
-	},
-	"end": {
-		"of": {
-			"choice": 6,
-			"loop": 7,
-			"procedure": 8
-		}
-	},
-	"procedure": {"!name": 9},
+	"if": {"it": {
+		"can't": {"move": {"forward": {"then": 1}}},
+		"can": {"move": {"forward": {"then": 2}}}
+	}},
+	"otherwise": 3,
+	"while": {"it": {
+		"can't": {"move": {"forward": {"repeat": 4}}},
+		"can": {"move": {"forward": {"repeat": 5}}}
+	}},
+	"the": {"end": {"of": {
+			"branching": 6,
+			"cycling": 7,
+			"subroutine": 8	
+	}}},
+	"subroutine": {"!name": 9},
 	"do": {"!name": 10}
 };
 /*================*/
@@ -31,8 +29,11 @@ i18n.strTable.en = {
 	/*-----------*/
 	/* index.html*/
 	/*-----------*/
-	1000: "DRAWING PLAYER",
-	1001: "DRAPL",
+	1000: "The Actor «Ladybug»",
+	1001: "Ihar S. Areshchankau",
+	1002: "Application: ",
+	1003: "version: ",
+	1004: "Developed by: ",
 	/*----------*/
 	/* index.js */
 	/*----------*/
@@ -71,57 +72,57 @@ i18n.strTable.en = {
 	23: "execute",
 	/* Message about program debugging mode switches on. */
 	24: "The program is being debugged…",
-	/* Text for input to the editor by menu items "jump", "step" and "turn". */
-	25: "jump",
+	/* Text for input to the editor by menu items "hop", "step" and "turn". */
+	25: "hop",
 	26: "step",
 	27: "turn",
 	/* Text for input to the editor for clarification "if" menu item. */
-	28: "edge ahead, then",
-	29: "no edge ahead, then",
+	28: "it can't move forward then",
+	29: "it can move forward then",
 	/* Menu items of the "if" clarification submode. */
-	30: "…edge ahead",
-	31: "…no edge ahead",
-	/* Text for input to the editor by menu items "if" and "else". */
+	30: "…it can't move forward",
+	31: "…it can move forward",
+	/* Text for input to the editor by menu items "if" and "otherwise". */
 	32: "if ",
-	33: "else",
+	33: "otherwise",
 	/* Text for input to the editor for clarification "while" menu item. */
-	34: "edge ahead, repeat",
-	35: "no edge ahead, repeat",
+	34: "it can't move forward repeat",
+	35: "it can move forward repeat",
 	/* Menu items of the "while" clarification submode. */
-	36: "…edge ahead",
-	37: "…no edge ahead",
-	/* Text for input to the editor by menu items "while", "do" and "procedure". */
+	36: "…it cant move forward",
+	37: "…it can move forward",
+	/* Text for input to the editor by menu items "while", "do" and "subroutine". */
 	38: "while ",
 	39: "do ",
-	40: "procedure ",
+	40: "subroutine ",
 	/* Text for input to the editor for clarification "end" menu item. */
-	41: "of choice",
-	42: "of loop",
-	43: "of procedure",
+	41: "of branching",
+	42: "of cycling",
+	43: "of subroutine",
 	/* Menu items of the "end" clarification submode. */
-	44: "…of choice",
-	45: "…of loop",
-	46: "…of procedure",
+	44: "…of branching",
+	45: "…of cycling",
+	46: "…of subroutine",
 	/* Text for input to the editor by menu item "end". */
-	47: "end ",
+	47: "the end ",
 	/* Menu items of additional commands programming submode. */
 	48: "if…",
-	49: "else",
+	49: "otherwise",
 	50: "while…",
 	51: "do",
-	52: "procedure",
-	53: "end…",
+	52: "subroutine",
+	53: "the end…",
 	54: "back",
 	/* Confirmation message about the text editor content erase. */
 	55: "Are you sure to erase all the whole program?",
 	/* Mode №1 menu items. */
-	56: "jump",
+	56: "hop",
 	57: "step",
 	58: "turn",
 	59: "reset",
 	60: "programming",
 	/* Mode №2 menu items. */
-	61: "jump",
+	61: "hop",
 	62: "step",
 	63: "turn",
 	64: "erase",
@@ -132,6 +133,11 @@ i18n.strTable.en = {
 	68: "upshot",
 	69: "reset",
 	70: "interact",
+	/* Statusbar. */
+	71: "Sound [Alt+s]:",
+	72: "norm.",
+	73: "adv.",
+	74: "off",
 	/*------------*/
 	/* program.js */
 	/*------------*/
@@ -139,16 +145,16 @@ i18n.strTable.en = {
 	102: "end of string",
 	103: "Runtime error.",
 	104: "The command \"%1\" is missed.",
-	105: "end of choice",
-	106: "end of loop",
-	107: "end of procedure",
+	105: "end of branching",
+	106: "end of cycling",
+	107: "end of subroutine",
 	108: "The Player is crashed.",
 	109: "The nesting level is exceeded.",
-	110: "\"else\" without preceding \"if\"",
+	110: "\"otherwise\" without preceding \"if\"",
 	111: "Another command.",
-	112: "\"end of choice\" without preceding \"if\"",
-	113: "\"end of loop\" without preceding \"while\"",
-	114: "\"end of procedure\" without preceding \"procedure\" or \"do\"",
+	112: "\"end of branching\" without preceding \"if\"",
+	113: "\"end of cycling\" without preceding \"while\"",
+	114: "\"end of subroutine\" without preceding \"subroutine\" or \"do\"",
 	115: "Procedure definition cannot be nested.",
 	116: "Procedure \"%1\" is not defined.",
 	117: "Line №%1 of the program: %2",

@@ -266,6 +266,8 @@ program.executeCommand = function (done, imdone)
 					this.active = this.command.code == 1 || this.command.code == 4? player.queryEdgeAhead ():
 						!player.queryEdgeAhead ();
 					if (this.mode != 1) {
+						/* Звуковое сопровождение результата проверки в обычном режиме выполнения или в режиме отладки. */
+						app.soundPlay (this.active? "True": "False");
 						/* Демонстрация результата проверки в обычном режиме выполнения или в режиме отладки. */
 						editor.flashSelection (this.active? 1: 2, o.timeout, planNextCommand);
 						nextCommandIsScheduled = true;
@@ -293,6 +295,8 @@ program.executeCommand = function (done, imdone)
 							/* установлено после выполнения рассматриваемой команды. */
 							this.active = this.npass > 0;
 							this.npass = 0;
+							/* Звуковое сопровождение инверсии результата проверки в обычном режиме выполнения или в режиме отладки. */
+							app.soundPlay (this.active? "True": "False");
 							/* Демонстрация инверсии результата проверки в обычном режиме или в режиме отладки. */
 							editor.flashSelection (this.active? 1: 2, o.timeout, planNextCommand);
 							nextCommandIsScheduled = true;
@@ -322,7 +326,9 @@ program.executeCommand = function (done, imdone)
 			if (this.npass == 0) {
 				topOfStack = this.stack.pop ();
 				if (topOfStack && (topOfStack.code == 1 || topOfStack.code == 2))
-					if (topOfStack.active && this.mode != 1)
+					if (topOfStack.active && this.mode != 1) {
+						/* Звуковое сопровождение завершения блока ветвления в обычном режиме или режиме отладки. */
+						app.soundPlay ("Neutral");
 						if (this.active) {
 							/* Обозначение завершения блока ветвления в обычном режиме или режиме отладки. */
 							editor.flashSelection (0, o.timeout, planNextCommand);
@@ -334,8 +340,9 @@ program.executeCommand = function (done, imdone)
 							this.npass = 1;
 							this.ip--;
 						}
+					}
 					else
-						/* В режиме быстрого выполдения или когда ветвление пропускаяется */
+						/* В режиме быстрого выполдения или когда ветвление пропускается */
 						/* просто обновляется признак активности выполнения программы. */
 						this.active = topOfStack.active;
 				else
@@ -362,6 +369,8 @@ program.executeCommand = function (done, imdone)
 					/* Установка начала цикла в качестве очередной команды. */
 					this.ip = topOfStack.ip - 1;
 					if (this.mode != 1) {
+						/* Звуковое сопровождение конца цикла в обычном режиме или режиме отладки. */
+						app.soundPlay ("Back");
 						/* Демонстрация завершения конца цикла в обычном режиме или режиме отладки. */
 						editor.flashSelection (0, o.timeout, planNextCommand);
 						nextCommandIsScheduled = true;
@@ -389,6 +398,8 @@ program.executeCommand = function (done, imdone)
 					/* ("сделай" помещается в стек только в активном режиме) */
 					this.ip = topOfStack.ip;
 					if (this.mode != 1) {
+						/* Звуковое сопровождение конца процедуры в обычном режиме или режиме отладки. */
+						app.soundPlay ("Back");
 						/* Демонстрация конца процедуры в обычном режиме или режиме отладки. */
 						editor.flashSelection (0, o.timeout, planNextCommand);
 						nextCommandIsScheduled = true;
@@ -423,6 +434,8 @@ program.executeCommand = function (done, imdone)
 				/* Сброс признака перехода по команде "сделай". */
 				this.npass = 0;
 				if (this.mode != 1) {
+					/* Звуковое сопровождение начала выполнения процедуры в обычном режиме или режиме отладки. */
+					app.soundPlay ("Neutral");
 					/* Демонстрация начала выполнения процедуры в обычном режиме или режиме отладки. */
 					editor.flashSelection (0, o.timeout, planNextCommand);
 					nextCommandIsScheduled = true;
@@ -438,6 +451,8 @@ program.executeCommand = function (done, imdone)
 						/* Установка признака перехода по команде "сделай". */
 						this.npass = 1;
 						if (this.mode != 1) {
+							/* Звуковое сопровождение начала выполнения процедуры в обычном режиме или режиме отладки. */
+							app.soundPlay ("Into");
 							/* Демонстрация выполнения команды вызова подпрограммы в обычном режиме или режиме отладки. */
 							editor.flashSelection (0, o.timeout, planNextCommand);
 							nextCommandIsScheduled = true;

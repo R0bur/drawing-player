@@ -1,20 +1,31 @@
 ﻿/*======================*/
 /* Горизонтальное меню. */
 /*======================*/
+var menubar = new Object ();
+/*=======================================================*/
+/* Подготовка к использованию горизонтального меню.      */
+/* elem - элемент-контейнер HTMLElement для строки меню. */
+/* Примечание. Поле items с информацией о пунктах меню   */
+/* используется глобальным обработчиком событий от       */
+/* клавиатуры.                                           */
+/*=======================================================*/
+menubar.init = function (elem) {
+	this.elem = elem;
+	this.items = new Array ();
+};
 /*==============================================================*/
 /* Создание горизонтального меню.                               */
-/* Вызов: elem - элемент-контейнер HTMLElement для строки меню, */
-/*        items - массив объектов, представляющих пункты меню:  */
+/* Вызов: items - массив объектов, представляющих пункты меню:  */
 /*        .hotkey - клавиша вызова пункта меню,                 */
 /*        .text - текст пункта меню,                            */
 /*        .handler - функция-обработчик пункта меню.            */
 /*==============================================================*/
-function createMenubar (elem, items)
-{
-	var body = document.getElementsByTagName ("body")[0], i, sk, ai;
+menubar.replace = function (items) {
+	var i, sk, ai
+	this.items = items;
 	/* Очистка строки меню. */
-	while (elem.hasChildNodes ())
-		elem.removeChild (elem.lastChild);
+	while (this.elem.hasChildNodes ())
+		this.elem.removeChild (this.elem.lastChild);
 	/* Составление строки меню. */
 	for (i in items) {
 		sk = document.createElement ("span");
@@ -27,20 +38,11 @@ function createMenubar (elem, items)
 		ai.onclick = function (handler) {
 			return function () { if (app.userinput) handler (); return false; };
 		} (items[i].handler);
-		elem.appendChild (ai);
+		this.elem.appendChild (ai);
 	}
-	/* Установка обработчика событий от клавиатуры. */
-	body.onkeydown = function () {
-		var result = true, i, key = event.key.substring (0, 3).toUpperCase ();
-		for (i in items)
-			if (key == items[i].hotkey) {
-				if (app.userinput)
-					items[i].handler ();
-				result = false;
-				break;
-			}
-		/* if (result)
-			debugObject (event, "Объект event"); */
-		return result;
-	}
+};
+/* Прототип старой функции createMenubar
+function createMenubar (elem, items)
+{
 }
+*/

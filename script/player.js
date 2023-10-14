@@ -58,6 +58,8 @@ player.walk = function (drawing, done, phase)
 		/* Изменение вида указателя в случае возникновения ошибки. */
 		if (this.e)
 			boardptr.view (this.d, 4, 1);
+		else
+			app.soundPlay (drawing? "Step": "Hop");
 	}
 	if (phase < nph){
 		/* Промежуточная фаза перемещения. */
@@ -66,7 +68,7 @@ player.walk = function (drawing, done, phase)
 			board.drawLine (this.c, this.r, this.directions[this.d].dc, this.directions[this.d].dr, k);
 		boardptr.view (this.d, drawing? 2: 1, phase);
 		boardptr.move (this.c, this.r, this.directions[this.d].dc, this.directions[this.d].dr, this.d, phase, nph);
-		/* Плинирование следующей фазы. */
+		/* Планирование следующей фазы. */
 		o = this;
 		setTimeout (function () { o.walk (drawing, done, phase + 1); }, this.timeout);
 	}
@@ -90,9 +92,11 @@ player.turn = function (done, phase)
 {
 	var o, d1, d2, nph = 4;
 	/* Выполнение фазы поворота исполнителя. */
-	if (!phase)
+	if (!phase) {
 		/* Начальная фаза поворота. */
 		phase = this.e? nph: 1;
+		app.soundPlay ("Turn");
+	}
 	if (phase < nph) {
 		/* Промежуточная фаза поворота. */
 		d1 = this.directions[this.d];
