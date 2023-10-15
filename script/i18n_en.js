@@ -89,7 +89,7 @@ i18n.strTable.en = {
 	34: "it can't move forward repeat",
 	35: "it can move forward repeat",
 	/* Menu items of the "while" clarification submode. */
-	36: "…it cant move forward",
+	36: "…it can't move forward",
 	37: "…it can move forward",
 	/* Text for input to the editor by menu items "while", "do" and "subroutine". */
 	38: "while ",
