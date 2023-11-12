@@ -138,6 +138,8 @@ i18n.strTable.en = {
 	72: "norm.",
 	73: "adv.",
 	74: "off",
+	/* Program execution time. */
+	75: "Execution time: %1 sec.",
 	/*------------*/
 	/* program.js */
 	/*------------*/

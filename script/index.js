@@ -164,7 +164,7 @@ function start ()
 			/* Воспроизведение мелодии начинается автоматически по готовности плеера. */
 			/* Обработка события установлена выше в init () { soundCache () { ... }}. */
 		}
-	}
+	};
 	/*-------------------------------------*/
 	/* Разрешение пользовательского ввода. */
 	/*-------------------------------------*/
@@ -290,26 +290,42 @@ function start ()
 	/*---------------------------------------------------*/
 	function prgStart (mode)
 	{
-		var actions, msg;
+		var actions, msg, tmStart;
+		/*-----------------------------------------------*/
+		/* Получение текущей отметки времени в секундах. */
+		/*-----------------------------------------------*/
+		function getCurrentSeconds ()
+		{
+			var dt = new Date ();
+			return Math.floor (0.001 * dt.getTime ());
+		}
 		/*---------------------------------------------------------*/
 		/* Функция, выполняемая после завершения работы программы. */
 		/*---------------------------------------------------------*/
 		function prgDone ()
 		{
+			var msg, dTime;
 			if (program.error) {
 				/* Звуковое сопровождение завершения программы с ошибкой. */
 				app.soundPlay ("Fail");
-				/* Отображение информации о результате выполнения программы. */
-				switchMode (elemMenubar, 2, false, "", "-" + program.getErrorMessage ());
+				/* Подготовка информации о результате выполнения программы. */
+				msg = "-" + program.getErrorMessage ();
 			}
 			else {
 				/* Звуковое сопровождение успешного завершения программы. */
 				app.soundPlay ("Success");
-				/* Отображение информации о результате выполнения программы. */
-				switchMode (elemMenubar, 2, false, "", i18n.string (12) + "\n" +
+				/* Подготовка информации о результате выполнения программы. */
+				msg = i18n.string (12) + "\n" +
 				i18n.string (13, program.counters[0], program.counters[1], program.counters[2]) + "\n" +
-				i18n.string (14, program.counters[0] + program.counters[1] + program.counters[2]));
+				i18n.string (14, program.counters[0] + program.counters[1] + program.counters[2]);
+				if (tmStart > 0) {
+					/* Добавление информации о времени выполнения программы. */
+					dTime = getCurrentSeconds () - tmStart;
+					msg += "\n" + i18n.string (75, dTime);
+				}
 			}
+			/* Отображение информации о результате выполнения программы. */
+			switchMode (elemMenubar, 2, false, "", msg);
 		}
 		/*----------------------------------*/
 		/* Прерывание выполнения программы. */
@@ -370,6 +386,7 @@ function start ()
 		}
 		menubar.replace (actions);
 		bulletin.placeInfo (msg);
+		tmStart = mode == 0? getCurrentSeconds (): 0;
 		if (mode < 3)
 			program.start (mode, prgDone);
 		else if (mode == 3)

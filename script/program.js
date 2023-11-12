@@ -490,6 +490,9 @@ program.executeCommand = function (done, imdone)
 /*====================================*/
 program.turnDebugOn = function ()
 {
+	if (this.mode == 1)
+		/* Включение отображения исполнителя после быстрого режима. */
+		player.display (true);
 	this.mode = 2;
 }
 /*================================================================*/
