@@ -4,12 +4,17 @@
 var player = new Object ();
 /*==================================*/
 /* Подготовка исполнителя к работе. */
+/* Вызов: nc - количество столбцов, */
+/*        nr - количество строк.    */
 /*==================================*/
-player.init = function ()
+player.init = function (nc, nr)
 {
 	this.directions = [{dc: 1, dr: 0}, {dc: 0, dr: -1}, {dc: -1, dr: 0}, {dc: 0, dr: 1}];
-	this.nc = 16;		/* количество столбцов */
-	this.nr = 20;		/* количество строк */
+	this.c0 = 0;		/* начальный столбец */
+	this.r0 = 0;		/* начальная строка */
+	this.d0 = 0;		/* начальное направление */
+	this.nc = nc;		/* количество столбцов */
+	this.nr = nr;		/* количество строк */
 	this.timeout = 250;	/* время фазы исполнения в миллисекундах */
 };
 /*===========================================*/
@@ -31,14 +36,39 @@ player.display = function (f)
 /*===========================================*/
 player.reset = function ()
 {
-	this.c = 0;	/* столбец */
-	this.r = 0;	/* строка */
-	this.d = 0;	/* направление */
+	this.c = this.c0;	/* столбец */
+	this.r = this.r0;	/* строка */
+	this.d = this.d0;	/* направление */
 	this.e = false;	/* признак ошибки */
 	board.wash ();
+	if (task.isset ())
+		board.drawTask (task.m, task.c1, task.r1, this.directions[task.d1].dc, this.directions[task.d1].dr);
+	boardmap.wash ();
 	boardptr.view (this.d, 0, 0);
 	boardptr.move (this.c, this.r, this.directions[this.d].dc, this.directions[this.d].dr, this.d, 0, 1);
 };
+/*=================================================================*/
+/* Использование текущей позиции исполнителя в качестве начальной. */
+/*=================================================================*/
+player.home = function ()
+{
+	this.c0 = this.c;
+	this.r0 = this.r;
+	this.d0 = this.d;
+	app.soundPlay ("AppInit");
+};
+/*=========================================*/
+/* Указание начальной позиции исполнителю. */
+/* Вызов: c - начальный столбец,           */
+/*        r - начальная строка,            */
+/*        d - начальное направление.       */
+/*=========================================*/
+player.setHome = function (c, r, d)
+{
+	this.c0 = c;
+	this.r0 = r;
+	this.d0 = d;
+}
 /*=====================================================*/
 /* Перемещение исполнителя в текущем направлении.      */
 /* Вызов: drawing - признак рисования при перемещении, */
@@ -75,6 +105,8 @@ player.walk = function (drawing, done, phase)
 	else {
 		/* Завершающая фаза перемещения. */
 		if (!this.e) {
+			if (drawing)
+				boardmap.drawLine (this.c, this.r, this.directions[this.d].dc, this.directions[this.d].dr);
 			this.c = newC;
 			this.r = newR;
 			boardptr.view (this.d, drawing? 2: 1, 0);
@@ -131,8 +163,10 @@ player.quickWalk = function (drawing, done) {
 	this.e = this.e || !(0 <= newC && newC < this.nc && 0 <= newR && newR < this.nr);
 	if (!this.e) {
 		/* Рисование линии при необходимости. */
-		if (drawing)
+		if (drawing) {
 			board.drawLine (this.c, this.r, this.directions[this.d].dc, this.directions[this.d].dr, 1.0);
+			boardmap.drawLine (this.c, this.r, this.directions[this.d].dc, this.directions[this.d].dr);
+		}
 		/* Обновление координат. */
 		this.c = newC;
 		this.r = newR;

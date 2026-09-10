@@ -205,7 +205,7 @@ function start ()
 	/*---------------------------------*/
 	/* Выполнение прыжка исполнителем. */
 	/*---------------------------------*/
-	function doJump ()
+	function doHop ()
 	{
 		disableUserInput ();
 		player.walk (false, afterMove, 0);
@@ -245,7 +245,7 @@ function start ()
 	/*        description - описание нового режима.   */
 	/*------------------------------------------------*/
 	function switchMode (elem, mode, fe, title, description) {
-		app.userinput = false;
+		disableUserInput ();
 		editor.enable (fe);
 		menubar.replace (app.modes[mode]);
 		if (title != "")
@@ -257,7 +257,7 @@ function start ()
 				bulletin.placeError (description.substring (1, description.length));
 			else
 				bulletin.placeInfo (description);
-		app.userinput = true;
+		enableUserInput ();
 		app.mode = mode;
 	}
 	/*-------------------------------------------------------*/
@@ -304,7 +304,7 @@ function start ()
 		/*---------------------------------------------------------*/
 		function prgDone ()
 		{
-			var msg, dTime;
+			var msg, dTime, res, lines;
 			if (program.error) {
 				/* Звуковое сопровождение завершения программы с ошибкой. */
 				app.soundPlay ("Fail");
@@ -312,16 +312,49 @@ function start ()
 				msg = "-" + program.getErrorMessage ();
 			}
 			else {
-				/* Звуковое сопровождение успешного завершения программы. */
-				app.soundPlay ("Success");
-				/* Подготовка информации о результате выполнения программы. */
-				msg = i18n.string (12) + "\n" +
-				i18n.string (13, program.counters[0], program.counters[1], program.counters[2]) + "\n" +
-				i18n.string (14, program.counters[0] + program.counters[1] + program.counters[2]);
-				if (tmStart > 0) {
-					/* Добавление информации о времени выполнения программы. */
-					dTime = getCurrentSeconds () - tmStart;
-					msg += "\n" + i18n.string (75, dTime);
+				if (task.isset ()) {
+					/* Проверка правильности решения задачи. */
+					res = task.check (boardmap.m, player.c, player.r, player.d);
+					lines = new Array ();
+					if (res.n1 != 0)
+						lines.push (" - " + i18n.string (78, res.n1));
+					if (res.n2 != 0)
+						lines.push (" - " + i18n.string (79, res.n2));
+					if (!res.ap)
+						lines.push (" - " + i18n.string (80));
+					if (lines.length == 0) {
+						/* Приведение внешнего вида указателя в соотвтетствие с успешным выполнением задания. */
+						boardptr.view (player.d, 5, 1);
+						/* Звуковое сопровождение успешного выполнения задания. */
+						app.soundPlay ("Success");
+						/* Подготовка информации о результате выполнения программы. */
+						msg = i18n.string (76) + "\n" +
+						i18n.string (13, program.counters[0], program.counters[1], program.counters[2]) + "\n" +
+						i18n.string (14, program.counters[0] + program.counters[1] + program.counters[2]);
+						if (tmStart > 0) {
+							/* Добавление информации о времени выполнения программы. */
+							dTime = getCurrentSeconds () - tmStart;
+							msg += "\n" + i18n.string (75, dTime);
+						}
+					}
+					else {
+						/* Звуковое сопровождение неудачного выполнения задания. */
+						app.soundPlay ("Fail");
+						msg = i18n.string (77) + "\n" + lines.join (",\n") + ".";
+					}
+				}
+				else {
+					/* Звуковое сопровождение успешного завершения программы. */
+					app.soundPlay ("Success");
+					/* Подготовка информации о результате выполнения программы. */
+					msg = i18n.string (12) + "\n" +
+					i18n.string (13, program.counters[0], program.counters[1], program.counters[2]) + "\n" +
+					i18n.string (14, program.counters[0] + program.counters[1] + program.counters[2]);
+					if (tmStart > 0) {
+						/* Добавление информации о времени выполнения программы. */
+						dTime = getCurrentSeconds () - tmStart;
+						msg += "\n" + i18n.string (75, dTime);
+					}
 				}
 			}
 			/* Отображение информации о результате выполнения программы. */
@@ -369,6 +402,15 @@ function start ()
 			disableUserInput ();
 			program.executeCommand (prgDone, enableUserInput);
 		}
+		/*-----------------------------------------------------------------*/
+		/* В режиме решения задачи перед запуском программы любым способом */
+		/* осуществляется сброс обстановки в исходное состояние.           */
+		/*-----------------------------------------------------------------*/
+		if (mode < 3 && task.isset ())
+			doReset ();
+		/*--------------------------------------------*/
+		/* Настройка доступных пользователю действий. */
+		/*--------------------------------------------*/
 		if (mode != 2 && mode != 4) {
 			actions = [
 				{hotkey: "F1", text: i18n.string (18), handler: prgBreak},
@@ -386,6 +428,7 @@ function start ()
 		}
 		menubar.replace (actions);
 		bulletin.placeInfo (msg);
+		
 		tmStart = mode == 0? getCurrentSeconds (): 0;
 		if (mode < 3)
 			program.start (mode, prgDone);
@@ -416,7 +459,7 @@ function start ()
 	/*------------------------*/
 	/* Ввод команды "прыжок". */
 	/*------------------------*/
-	function ediJump ()
+	function ediHop ()
 	{
 		editor.insert (i18n.string (25) + "\n");
 	}
@@ -612,10 +655,30 @@ function start ()
 					break;
 				}
 			/* Обработка других привязок. */
-			if (result && event.code == "KeyA" && event.altKey && !event.shiftKey && !event.ctrlKey) {
-				/* Отображение информации о продукте и авторе. */
-				displayAboutBox ();
-				result = false;
+			if (app.userinput) {
+				if (result && event.code == "KeyA" && event.altKey && !event.shiftKey && !event.ctrlKey) {
+					/* Отображение информации о продукте и авторе. */
+					displayAboutBox ();
+					result = false;
+				}
+				if (app.mode == 0) {
+					if (result && event.code == "KeyH" && event.altKey && !event.shiftKey && !event.ctrlKey) {
+						/* Использование текущей позиции исполнителя в качестве начальной. */
+						player.home ();
+						result = false;
+					}
+					if (result && event.code == "KeyT" && event.altKey && !event.shiftKey && !event.ctrlKey) {
+						/* Получение описания текущей обстановки. */
+						getCurrentSituation ();
+						result = false;
+					}
+				}
+				if (app.mode == 1)
+					if (result && event.code == "KeyT" && event.altKey && !event.shiftKey && !event.ctrlKey) {
+						/* Переключение на сценарий решения задачи. */
+						taskSolvingMode ();
+						result = flase;
+					}
 			}
 			if (result && event.code == "KeyS" && event.altKey && !event.shiftKey && !event.ctrlKey) {
 				/* Включение/выключение звукового сопровождения. */
@@ -674,6 +737,42 @@ function start ()
 			updateStatusbar (elemStatusbar);
 		}
 	}
+	/*--------------------------=---------------*/
+	/* Переключение на сценарий решения задачи. */
+	/*---------------------------=--------------*/
+	function taskSolvingMode ()
+	{
+		disableUserInput ();
+		var s = window.prompt (i18n.string (81));
+		if (s != null)
+			if (s.length > 0)
+				if (task.unpack (s, app.abc)) {
+					player.setHome (task.c0, task.r0, task.d0);
+					doReset ();
+				}
+				else
+					window.alert (i18n.string (82));
+			else {
+				task.remove ();
+				player.setHome (0, 0, 0);
+				doReset ();
+			}
+		enableUserInput ();
+	}
+	/*-------------------------------*/
+	/* Получение текущей обстановки. */
+	/*-------------------------------*/
+	function getCurrentSituation ()
+	{
+		var start, map, finish, abc = app.abc, s;
+		disableUserInput ();
+		start = abc.charAt (player.c0) + abc.charAt (player.r0) + abc.charAt (player.d0);
+		map = boardmap.pack (app.abc);
+		finish = abc.charAt (player.c) + abc.charAt (player.r) + abc.charAt (player.d);
+		s = start + map + finish;
+		window.prompt (i18n.string (83), s);
+		enableUserInput ();
+	}
 	/*--------------------------------------------*/
 	/* Отображение информации о продукте и авторе.*/
 	/*--------------------------------------------*/
@@ -692,7 +791,7 @@ function start ()
 	app.modes = [
 	/* 0 - Режим непосредственного выполнения команд. */
 	[
-		{hotkey: "F1", text: i18n.string (56), handler: doJump},
+		{hotkey: "F1", text: i18n.string (56), handler: doHop},
 		{hotkey: "F2", text: i18n.string (57), handler: doStep},
 		{hotkey: "F3", text: i18n.string (58), handler: doTurn},
 		{hotkey: "ESC", text: i18n.string (59), handler: doReset},
@@ -700,7 +799,7 @@ function start ()
 	],
 	/* 1 - Режим программирования. */
 	[
-		{hotkey: "F1", text: i18n.string (61), handler: ediJump},
+		{hotkey: "F1", text: i18n.string (61), handler: ediHop},
 		{hotkey: "F2", text: i18n.string (62), handler: ediStep},
 		{hotkey: "F3", text: i18n.string (63), handler: ediTurn},
 		{hotkey: "F4", text: "…", handler: ediCommands},
@@ -716,10 +815,18 @@ function start ()
 		{hotkey: "TAB", text: i18n.string (70), handler: switchMode1}
 	]
 	];
-	app.userinput = false;
-	player.init ();
+	app.abc = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-=";
+	disableUserInput ();
+	player.init (16, 20);
+	boardmap.init (16, 20);
+	task.init (16, 20);
+	if (typeof (app.task) == "string" && app.task.length > 0)
+		if (task.unpack (app.task, app.abc))
+			player.setHome (task.c0, task.r0, task.d0);
+		else
+			window.alert ("Error: Can't unpack the task statement!");
 	menubar.init (document.getElementById ("menubar"));
-	board.init (document.getElementById ("board"), 301, 381, 20, 20);
+	board.init (document.getElementById ("board"), 340, 420, 20, 20, 15, 19);
 	boardptr.init (board, "img/sprite.gif", 24, 24);
 	editor.init (document.getElementById ("editor").firstChild);
 	bulletin.init (document.getElementById ("bulletin"));
@@ -738,4 +845,7 @@ function start ()
 	/* Теперь, когда всё настроено, можно отобразить экран приложения, */
 	/* убрав класс "hidden" у элемента "body".                         */
 	elemBody.className = "";
+	/* Перенос фокуса на редактор текста программы. */
+	if (app.mode == 1)
+		editor.elem.focus ();
 }

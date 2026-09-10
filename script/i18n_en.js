@@ -54,7 +54,7 @@ i18n.strTable.en = {
 	11: "Press [TAB] for the interactive mode.",
 	/* Successful program termination message. */
 	12: "+The program execution is done successfully.",
-	13: "Jumps: %1, steps: %2, turns: %3.",
+	13: "Hops: %1, steps: %2, turns: %3.",
 	14: "Total actions: %1.",
 	/* Messages about the user breaks program execution. */
 	15: "The program is terminated.",
@@ -140,6 +140,15 @@ i18n.strTable.en = {
 	74: "off",
 	/* Program execution time. */
 	75: "Execution time: %1 sec.",
+	/* Task solving. */
+	76: "+The Task is Completed!",
+	77: "-The Task is NOT Completed, because:",
+	78: "not all specified segments were painted (%1)",
+	79: "some segments were painted by mistake (%1)",
+	80: "the actor did not take the required place",
+	81: "Enter the packed task statement (empty line removes the current task).\nPaste from the clipboard: Ctrl+V, Enter.",
+	82: "Error: Can't unpack the task statement!",
+	83: "Here is a string with the packed task statement.\nCopy to the clipboard: Ctrl+C, Enter.",
 	/*------------*/
 	/* program.js */
 	/*------------*/

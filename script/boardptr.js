@@ -43,7 +43,8 @@ boardptr.display = function (f)
 /*        1 - прыжок,                              */
 /*        2 - шаг,                                 */
 /*        3 - поворот,                             */
-/*        4 - ошибка.                              */
+/*        4 - ошибка,                              */
+/*        5 - правильное решение задачи.           */
 /*        phase - фаза действия.                   */
 /* Нулевая фаза в любом варианте действия означает */
 /* состояние покоя.                                */
@@ -54,7 +55,7 @@ boardptr.view = function (direction, action, phase)
 	w = this.sprite.getWidth ();
 	h = this.sprite.getHeight ();
 	ix = direction * w;
-	iy = action > 4 || action < 1 || phase < 1? 0: h * 3 * (action - 1) + h * phase;
+	iy = action > 5 || action < 1 || phase < 1? 0: h * 3 * (action - 1) + h * phase;
 	this.sprite.moveImageTo (-ix, -iy);
 };
 /*========================================================*/
@@ -69,8 +70,8 @@ boardptr.move = function (c, r, dc, dr, d, phm, nphm)
 {
 	var x, y, w, h, k;
 	/* Вычисление экранных координат текущего узла. */
-	x = this.x0 + this.board.sx * c + 2;
-	y = this.y0 + this.board.sy * r + 1;
+	x = this.x0 + this.board.sx * (1 + c);
+	y = this.y0 + this.board.sy * (1 + r) - 1;
 	/* Смещение спрайта относительно узла в сторону перемещения. */
 	w = this.sprite.getWidth ();
 	h = this.sprite.getHeight ();
@@ -97,8 +98,8 @@ boardptr.turn = function (c, r, dc1, dr1, dc2, dr2, d, phd, nphd)
 	w = this.sprite.getWidth ();
 	h = this.sprite.getHeight ();
 	/* Вычисление экранных координат текущего узла. */
-	x = this.x0 + this.board.sx * c + 2;
-	y = this.y0 + this.board.sy * r + 1;
+	x = this.x0 + this.board.sx * (1 + c);
+	y = this.y0 + this.board.sy * (1 + r) - 1;
 	/* Вычисление позиции спрайта с учётом текущего направления перемещения. */
 	x1 = x + Math.floor ((dc1 - 1) * 0.5 * w);
 	y1 = y + Math.floor ((dr1 - 1) * 0.5 * h);
